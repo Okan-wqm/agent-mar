@@ -64,6 +64,59 @@ mkdir -p "$CLIENT_DIR/data/reports/daily"
 mkdir -p "$CLIENT_DIR/data/reports/weekly"
 mkdir -p "$CLIENT_DIR/data/reports/monthly"
 
+# LinkedIn outreach
+mkdir -p "$CLIENT_DIR/data/linkedin/sequences"
+mkdir -p "$CLIENT_DIR/data/linkedin/messages"
+
+# A/B testing
+mkdir -p "$CLIENT_DIR/data/abtests/results"
+
+# Landing pages
+mkdir -p "$CLIENT_DIR/data/landing-pages"
+
+# SEO
+mkdir -p "$CLIENT_DIR/data/seo"
+
+# ABM (Account-Based Marketing)
+mkdir -p "$CLIENT_DIR/data/abm/accounts"
+mkdir -p "$CLIENT_DIR/data/abm/buying-committee-maps"
+
+# Social media
+mkdir -p "$CLIENT_DIR/data/social/calendar"
+mkdir -p "$CLIENT_DIR/data/social/posts/linkedin"
+mkdir -p "$CLIENT_DIR/data/social/posts/twitter"
+mkdir -p "$CLIENT_DIR/data/social/posts/instagram"
+mkdir -p "$CLIENT_DIR/data/social/posts/facebook"
+mkdir -p "$CLIENT_DIR/data/social/posts/approved"
+
+# Paid media / ads
+mkdir -p "$CLIENT_DIR/data/ads/campaigns"
+mkdir -p "$CLIENT_DIR/data/ads/creatives"
+mkdir -p "$CLIENT_DIR/data/ads/audiences"
+
+# Video
+mkdir -p "$CLIENT_DIR/data/video/scripts"
+mkdir -p "$CLIENT_DIR/data/video/webinars"
+
+# Sales enablement
+mkdir -p "$CLIENT_DIR/data/sales-enablement/battlecards"
+mkdir -p "$CLIENT_DIR/data/sales-enablement/proposals"
+mkdir -p "$CLIENT_DIR/data/sales-enablement/roi-frameworks"
+mkdir -p "$CLIENT_DIR/data/sales-enablement/case-studies"
+mkdir -p "$CLIENT_DIR/data/sales-enablement/objection-guides"
+mkdir -p "$CLIENT_DIR/data/sales-enablement/meeting-briefs"
+
+# Retention & growth
+mkdir -p "$CLIENT_DIR/data/retention/campaigns"
+mkdir -p "$CLIENT_DIR/data/retention/sequences"
+mkdir -p "$CLIENT_DIR/data/retention/surveys"
+
+# Multi-channel orchestration
+mkdir -p "$CLIENT_DIR/data/orchestration/lead-timelines"
+
+# Attribution
+mkdir -p "$CLIENT_DIR/data/attribution"
+
 # Logs
 mkdir -p "$CLIENT_DIR/logs/bootstrap"
 mkdir -p "$CLIENT_DIR/logs/operations"
@@ -73,7 +126,7 @@ mkdir -p "$CLIENT_DIR/reviews/round-1"
 mkdir -p "$CLIENT_DIR/reviews/round-2"
 mkdir -p "$CLIENT_DIR/reviews/final"
 
-echo "  ✓ Created 25+ directories"
+echo "  ✓ Created 60+ directories"
 
 # --- Copy shared system files ---
 echo "[2/5] Copying shared system files..."

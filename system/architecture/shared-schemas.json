@@ -927,6 +927,899 @@
         "started_at": { "type": "string", "format": "date-time" },
         "completed_at": { "type": "string", "format": "date-time" }
       }
+    },
+
+    "LinkedInOutreachSequence": {
+      "type": "object",
+      "description": "LinkedIn multi-step outreach sequence. Produced by LinkedIn Outreach Agent.",
+      "required": ["sequence_id", "target_segment", "steps"],
+      "properties": {
+        "sequence_id": {
+          "type": "string",
+          "pattern": "^LI-SEQ-\\d{4}-\\d{4}$"
+        },
+        "sequence_name": { "type": "string" },
+        "target_segment": { "type": "string" },
+        "target_persona": { "type": "string" },
+        "total_steps": { "type": "integer", "minimum": 1 },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["step_number", "action_type", "delay_days"],
+            "properties": {
+              "step_number": { "type": "integer", "minimum": 1 },
+              "action_type": {
+                "type": "string",
+                "enum": ["connection_request", "inmail", "comment", "profile_view", "endorse", "share", "follow", "voice_message", "group_message"]
+              },
+              "delay_days": { "type": "integer", "minimum": 0 },
+              "message_template": { "type": "string" },
+              "personalization_fields": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "character_limit": { "type": "integer" },
+              "condition": { "type": "string", "description": "Condition to execute this step (e.g., 'if connected', 'if not connected')" },
+              "fallback_action": { "type": "string" }
+            }
+          }
+        },
+        "coordination_rules": {
+          "type": "object",
+          "properties": {
+            "min_gap_hours_from_email": { "type": "integer", "default": 24 },
+            "avoid_same_day_as_email": { "type": "boolean", "default": true },
+            "pause_if_email_replied": { "type": "boolean", "default": true },
+            "linked_email_sequence_id": { "type": "string" }
+          }
+        },
+        "weekly_limits": {
+          "type": "object",
+          "properties": {
+            "max_connection_requests": { "type": "integer", "default": 100 },
+            "max_inmails": { "type": "integer", "default": 50 },
+            "max_messages": { "type": "integer", "default": 150 }
+          }
+        },
+        "exit_conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": { "type": "string" },
+              "action": { "type": "string" }
+            }
+          }
+        },
+        "status": { "type": "string", "enum": ["draft", "active", "paused", "completed", "archived"] },
+        "created_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" }
+      }
+    },
+
+    "ABTestConfig": {
+      "type": "object",
+      "description": "A/B test configuration and results. Managed by A/B Test Manager.",
+      "required": ["test_id", "test_name", "hypothesis", "test_type", "variants"],
+      "properties": {
+        "test_id": {
+          "type": "string",
+          "pattern": "^AB-\\d{4}-\\d{4}$"
+        },
+        "test_name": { "type": "string" },
+        "hypothesis": { "type": "string" },
+        "test_type": {
+          "type": "string",
+          "enum": ["subject_line", "cta", "send_time", "content_angle", "landing_page", "linkedin_message", "email_body", "ad_copy", "headline", "form_fields", "social_post"]
+        },
+        "channel": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "running", "paused", "completed", "cancelled"]
+        },
+        "variants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["variant_id", "name", "is_control"],
+            "properties": {
+              "variant_id": { "type": "string" },
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "is_control": { "type": "boolean" },
+              "content_reference": { "type": "string" }
+            }
+          }
+        },
+        "traffic_split": {
+          "type": "object",
+          "description": "Percentage allocation per variant",
+          "additionalProperties": { "type": "number" }
+        },
+        "sample_size_required": { "type": "integer" },
+        "confidence_threshold": { "type": "number", "default": 0.95 },
+        "primary_metric": { "type": "string" },
+        "secondary_metrics": { "type": "array", "items": { "type": "string" } },
+        "start_date": { "type": "string", "format": "date" },
+        "end_date": { "type": "string", "format": "date" },
+        "results": {
+          "type": "object",
+          "properties": {
+            "winner_variant": { "type": "string" },
+            "lift_percentage": { "type": "number" },
+            "confidence_level": { "type": "number" },
+            "p_value": { "type": "number" },
+            "sample_sizes_per_variant": {
+              "type": "object",
+              "additionalProperties": { "type": "integer" }
+            },
+            "metrics_per_variant": {
+              "type": "object",
+              "additionalProperties": { "type": "object" }
+            }
+          }
+        },
+        "created_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" }
+      }
+    },
+
+    "LandingPageSpec": {
+      "type": "object",
+      "description": "Landing page specification. Produced by Landing Page Agent.",
+      "required": ["page_id", "page_type", "title", "headline", "cta_text"],
+      "properties": {
+        "page_id": {
+          "type": "string",
+          "pattern": "^LP-\\d{4}-\\d{4}$"
+        },
+        "page_type": {
+          "type": "string",
+          "enum": ["lead_capture", "demo_booking", "whitepaper_download", "webinar_registration", "product_comparison", "case_study", "pricing", "free_trial", "contact"]
+        },
+        "title": { "type": "string" },
+        "headline": { "type": "string" },
+        "sub_headline": { "type": "string" },
+        "target_segment": { "type": "string" },
+        "target_persona": { "type": "string" },
+        "cta_text": { "type": "string" },
+        "cta_action": { "type": "string", "enum": ["form_submit", "calendar_booking", "download", "redirect", "chat"] },
+        "form_fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["field_name", "field_type", "required"],
+            "properties": {
+              "field_name": { "type": "string" },
+              "field_type": { "type": "string", "enum": ["text", "email", "phone", "select", "textarea", "checkbox", "radio", "hidden"] },
+              "required": { "type": "boolean" },
+              "placeholder": { "type": "string" },
+              "options": { "type": "array", "items": { "type": "string" } },
+              "validation_regex": { "type": "string" }
+            }
+          }
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "enum": ["hero", "benefits", "features", "social_proof", "testimonials", "faq", "pricing", "cta", "footer"] },
+              "content": { "type": "string" },
+              "order": { "type": "integer" }
+            }
+          }
+        },
+        "seo_meta": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string", "maxLength": 60 },
+            "description": { "type": "string", "maxLength": 160 },
+            "keywords": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "tracking": {
+          "type": "object",
+          "properties": {
+            "utm_source": { "type": "string" },
+            "utm_medium": { "type": "string" },
+            "utm_campaign": { "type": "string" },
+            "pixels": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "associated_sequence_id": { "type": "string" },
+        "associated_ad_campaign_id": { "type": "string" },
+        "html_file_path": { "type": "string" },
+        "thankyou_file_path": { "type": "string" },
+        "conversion_goal": { "type": "string" },
+        "status": { "type": "string", "enum": ["draft", "in_review", "approved", "live", "paused", "archived"] },
+        "created_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" }
+      }
+    },
+
+    "SEOKeywordResearch": {
+      "type": "object",
+      "description": "Keyword research and SEO analysis. Produced by SEO Agent.",
+      "required": ["research_id", "research_date", "keywords"],
+      "properties": {
+        "research_id": { "type": "string" },
+        "research_date": { "type": "string", "format": "date" },
+        "target_segment": { "type": "string" },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["keyword", "intent", "priority"],
+            "properties": {
+              "keyword": { "type": "string" },
+              "search_volume_estimate": { "type": "string", "enum": ["very_high", "high", "medium", "low", "very_low", "unknown"] },
+              "difficulty_estimate": { "type": "string", "enum": ["low", "medium", "high"] },
+              "intent": { "type": "string", "enum": ["informational", "navigational", "commercial", "transactional"] },
+              "funnel_stage": { "type": "string", "enum": ["awareness", "consideration", "decision"] },
+              "current_ranking": { "type": "string" },
+              "recommended_content_type": { "type": "string" },
+              "priority": { "type": "string", "enum": ["high", "medium", "low"] }
+            }
+          }
+        },
+        "content_gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "topic": { "type": "string" },
+              "competitor_covering": { "type": "array", "items": { "type": "string" } },
+              "our_status": { "type": "string", "enum": ["not_covered", "partially_covered", "outdated", "well_covered"] },
+              "opportunity_score": { "type": "number", "minimum": 1, "maximum": 10 }
+            }
+          }
+        },
+        "backlink_targets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "domain": { "type": "string" },
+              "relevance": { "type": "string", "enum": ["high", "medium", "low"] },
+              "approach_suggestion": { "type": "string" }
+            }
+          }
+        },
+        "technical_issues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "issue": { "type": "string" },
+              "severity": { "type": "string", "enum": ["critical", "major", "minor"] },
+              "fix_suggestion": { "type": "string" }
+            }
+          }
+        },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "generated_by": { "type": "string" }
+      }
+    },
+
+    "ABMAccountPlan": {
+      "type": "object",
+      "description": "Account-based marketing plan. Produced by ABM Coordinator.",
+      "required": ["account_id", "company_name", "tier", "account_status"],
+      "properties": {
+        "account_id": {
+          "type": "string",
+          "pattern": "^ACC-\\d{4}-\\d{4}$"
+        },
+        "company_name": { "type": "string" },
+        "tier": { "type": "integer", "enum": [1, 2, 3] },
+        "account_status": {
+          "type": "string",
+          "enum": ["identified", "researching", "engaged", "opportunity", "customer", "churned"]
+        },
+        "buying_committee": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["lead_id", "role"],
+            "properties": {
+              "lead_id": { "type": "string" },
+              "name": { "type": "string" },
+              "title": { "type": "string" },
+              "role": {
+                "type": "string",
+                "enum": ["decision_maker", "influencer", "champion", "blocker", "end_user", "evaluator", "budget_holder"]
+              },
+              "engagement_level": { "type": "string", "enum": ["cold", "warming", "engaged", "active", "champion"] },
+              "last_touchpoint": { "type": "string" },
+              "last_touchpoint_date": { "type": "string", "format": "date" },
+              "next_action": { "type": "string" },
+              "notes": { "type": "string" }
+            }
+          }
+        },
+        "engagement_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Aggregate engagement score across all contacts"
+        },
+        "engagement_history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": { "type": "string", "format": "date" },
+              "score": { "type": "number" },
+              "delta": { "type": "number" },
+              "key_event": { "type": "string" }
+            }
+          }
+        },
+        "channel_strategy": {
+          "type": "object",
+          "properties": {
+            "email_approach": { "type": "string" },
+            "linkedin_approach": { "type": "string" },
+            "content_approach": { "type": "string" },
+            "ads_approach": { "type": "string" },
+            "event_approach": { "type": "string" },
+            "phone_approach": { "type": "string" }
+          }
+        },
+        "key_messages_by_stakeholder": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "timeline": {
+          "type": "object",
+          "properties": {
+            "start_date": { "type": "string", "format": "date" },
+            "target_meeting_date": { "type": "string", "format": "date" },
+            "target_close_date": { "type": "string", "format": "date" }
+          }
+        },
+        "milestones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "milestone": { "type": "string" },
+              "target_date": { "type": "string", "format": "date" },
+              "status": { "type": "string", "enum": ["pending", "achieved", "missed", "skipped"] }
+            }
+          }
+        },
+        "alerts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "message": { "type": "string" },
+              "priority": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+              "date": { "type": "string", "format": "date" }
+            }
+          }
+        },
+        "estimated_deal_value": { "type": "number" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" }
+      }
+    },
+
+    "SocialMediaCalendar": {
+      "type": "object",
+      "description": "Weekly social media content calendar. Produced by Social Media Manager.",
+      "required": ["calendar_id", "week_start", "week_end", "posts"],
+      "properties": {
+        "calendar_id": { "type": "string" },
+        "week_start": { "type": "string", "format": "date" },
+        "week_end": { "type": "string", "format": "date" },
+        "platforms": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["linkedin", "twitter", "instagram", "facebook", "tiktok", "youtube"] }
+        },
+        "weekly_theme": { "type": "string" },
+        "content_mix_ratio": {
+          "type": "object",
+          "properties": {
+            "educational": { "type": "number" },
+            "promotional": { "type": "number" },
+            "engagement": { "type": "number" },
+            "thought_leadership": { "type": "number" }
+          }
+        },
+        "posts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["post_id", "platform", "post_type", "scheduled_datetime", "content"],
+            "properties": {
+              "post_id": { "type": "string" },
+              "platform": { "type": "string", "enum": ["linkedin", "twitter", "instagram", "facebook", "tiktok", "youtube"] },
+              "post_type": {
+                "type": "string",
+                "enum": ["text", "carousel", "poll", "thread", "story", "reel", "article", "event", "video", "image", "link_share"]
+              },
+              "scheduled_datetime": { "type": "string", "format": "date-time" },
+              "content": { "type": "string" },
+              "hashtags": { "type": "array", "items": { "type": "string" } },
+              "media_description": { "type": "string" },
+              "cta": { "type": "string" },
+              "target_audience": { "type": "string" },
+              "campaign_reference": { "type": "string" },
+              "content_category": { "type": "string", "enum": ["educational", "promotional", "engagement", "thought_leadership"] },
+              "status": { "type": "string", "enum": ["draft", "scheduled", "published", "failed", "cancelled"] },
+              "engagement_metrics": {
+                "type": "object",
+                "properties": {
+                  "impressions": { "type": "integer" },
+                  "likes": { "type": "integer" },
+                  "comments": { "type": "integer" },
+                  "shares": { "type": "integer" },
+                  "clicks": { "type": "integer" },
+                  "engagement_rate": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "created_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" }
+      }
+    },
+
+    "AdCampaignConfig": {
+      "type": "object",
+      "description": "Paid advertising campaign configuration. Produced by Paid Media Agent.",
+      "required": ["campaign_id", "campaign_name", "platform", "campaign_type", "targeting"],
+      "properties": {
+        "campaign_id": {
+          "type": "string",
+          "pattern": "^AD-\\d{4}-\\d{4}$"
+        },
+        "campaign_name": { "type": "string" },
+        "platform": {
+          "type": "string",
+          "enum": ["google_search", "google_display", "youtube", "linkedin", "meta_facebook", "meta_instagram", "twitter"]
+        },
+        "campaign_type": {
+          "type": "string",
+          "enum": ["awareness", "consideration", "conversion", "retargeting", "lookalike", "brand"]
+        },
+        "status": { "type": "string", "enum": ["draft", "active", "paused", "completed", "archived"] },
+        "objective": { "type": "string" },
+        "target_segment": { "type": "string" },
+        "budget": {
+          "type": "object",
+          "properties": {
+            "daily_budget": { "type": "number" },
+            "total_budget": { "type": "number" },
+            "currency": { "type": "string", "default": "USD" }
+          }
+        },
+        "schedule": {
+          "type": "object",
+          "properties": {
+            "start_date": { "type": "string", "format": "date" },
+            "end_date": { "type": "string", "format": "date" }
+          }
+        },
+        "targeting": {
+          "type": "object",
+          "properties": {
+            "job_titles": { "type": "array", "items": { "type": "string" } },
+            "industries": { "type": "array", "items": { "type": "string" } },
+            "company_sizes": { "type": "array", "items": { "type": "string" } },
+            "locations": { "type": "array", "items": { "type": "string" } },
+            "interests": { "type": "array", "items": { "type": "string" } },
+            "custom_audiences": { "type": "array", "items": { "type": "string" } },
+            "exclusions": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "ad_groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "group_name": { "type": "string" },
+              "keywords_or_targeting": { "type": "array", "items": { "type": "string" } },
+              "ads": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "headline": { "type": "string" },
+                    "description": { "type": "string" },
+                    "cta": { "type": "string" },
+                    "destination_url": { "type": "string" },
+                    "display_url": { "type": "string" },
+                    "media_description": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "bid_strategy": { "type": "string", "enum": ["manual_cpc", "target_cpa", "maximize_clicks", "maximize_conversions", "target_roas", "maximize_impressions"] },
+        "performance_targets": {
+          "type": "object",
+          "properties": {
+            "target_cpc": { "type": "number" },
+            "target_cpl": { "type": "number" },
+            "target_roas": { "type": "number" },
+            "target_ctr": { "type": "number" }
+          }
+        },
+        "actual_metrics": {
+          "type": "object",
+          "properties": {
+            "impressions": { "type": "integer" },
+            "clicks": { "type": "integer" },
+            "conversions": { "type": "integer" },
+            "spend": { "type": "number" },
+            "cpc": { "type": "number" },
+            "cpl": { "type": "number" },
+            "ctr": { "type": "number" },
+            "roas": { "type": "number" }
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "action": { "type": "string" },
+              "rationale": { "type": "string" },
+              "expected_impact": { "type": "string" }
+            }
+          }
+        },
+        "created_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" }
+      }
+    },
+
+    "VideoScriptBrief": {
+      "type": "object",
+      "description": "Video script specification. Produced by Video Script Agent.",
+      "required": ["script_id", "title", "video_type", "platform"],
+      "properties": {
+        "script_id": {
+          "type": "string",
+          "pattern": "^VID-\\d{4}-\\d{4}$"
+        },
+        "title": { "type": "string" },
+        "video_type": {
+          "type": "string",
+          "enum": ["explainer", "product_demo", "testimonial", "thought_leadership", "social_reel", "webinar", "sales_demo", "onboarding", "podcast", "tutorial", "brand_story"]
+        },
+        "platform": {
+          "type": "string",
+          "enum": ["youtube", "linkedin", "instagram", "tiktok", "website", "all"]
+        },
+        "target_duration_seconds": { "type": "integer" },
+        "target_segment": { "type": "string" },
+        "target_persona": { "type": "string" },
+        "hook": { "type": "string", "description": "First 3 seconds — attention grabber" },
+        "key_messages": { "type": "array", "items": { "type": "string" } },
+        "cta": { "type": "string" },
+        "scenes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["scene_number", "narration"],
+            "properties": {
+              "scene_number": { "type": "integer" },
+              "timestamp_start": { "type": "string" },
+              "timestamp_end": { "type": "string" },
+              "narration": { "type": "string" },
+              "visual_direction": { "type": "string" },
+              "on_screen_text": { "type": "string" },
+              "b_roll_suggestion": { "type": "string" }
+            }
+          }
+        },
+        "thumbnail_suggestions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "concept": { "type": "string" },
+              "text_overlay": { "type": "string" }
+            }
+          }
+        },
+        "seo": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "description": { "type": "string" },
+            "tags": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "script_file_path": { "type": "string" },
+        "status": { "type": "string", "enum": ["draft", "in_review", "approved", "produced", "published"] },
+        "created_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" }
+      }
+    },
+
+    "SalesEnablementAsset": {
+      "type": "object",
+      "description": "Sales support material specification. Produced by Sales Enablement Agent.",
+      "required": ["asset_id", "asset_type", "title"],
+      "properties": {
+        "asset_id": { "type": "string" },
+        "asset_type": {
+          "type": "string",
+          "enum": ["battlecard", "proposal", "roi_framework", "case_study", "objection_guide", "one_pager", "comparison_sheet", "meeting_brief", "follow_up_template", "pitch_deck_outline", "product_sheet"]
+        },
+        "title": { "type": "string" },
+        "target_segment": { "type": "string" },
+        "target_persona": { "type": "string" },
+        "competitor_focus": { "type": "string" },
+        "account_id": { "type": "string" },
+        "file_path": { "type": "string" },
+        "key_points": { "type": "array", "items": { "type": "string" } },
+        "last_updated": { "type": "string", "format": "date" },
+        "version": { "type": "string" },
+        "status": { "type": "string", "enum": ["draft", "current", "outdated", "archived"] },
+        "usage_count": { "type": "integer", "default": 0 },
+        "effectiveness_rating": { "type": "number", "minimum": 1, "maximum": 10 },
+        "created_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" }
+      }
+    },
+
+    "RetentionCampaign": {
+      "type": "object",
+      "description": "Customer retention/growth campaign. Produced by Retention & Growth Agent.",
+      "required": ["campaign_id", "campaign_type", "target_customer_segment"],
+      "properties": {
+        "campaign_id": {
+          "type": "string",
+          "pattern": "^RET-\\d{4}-\\d{4}$"
+        },
+        "campaign_type": {
+          "type": "string",
+          "enum": ["onboarding", "upsell", "cross_sell", "re_engagement", "nps_survey", "referral", "review_collection", "feature_announcement", "renewal_reminder", "win_back", "loyalty", "milestone_celebration"]
+        },
+        "campaign_name": { "type": "string" },
+        "target_customer_segment": { "type": "string" },
+        "customer_lifecycle_stage": {
+          "type": "string",
+          "enum": ["new", "active", "at_risk", "churning", "churned", "advocate"]
+        },
+        "trigger_conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition_type": { "type": "string" },
+              "threshold": { "type": "string" },
+              "timeframe": { "type": "string" }
+            }
+          }
+        },
+        "health_score_threshold": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "number" },
+            "max": { "type": "number" }
+          }
+        },
+        "emails": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "step": { "type": "integer" },
+              "delay_days": { "type": "integer" },
+              "purpose": { "type": "string" },
+              "content_reference": { "type": "string" }
+            }
+          }
+        },
+        "success_metrics": {
+          "type": "object",
+          "properties": {
+            "target_nps": { "type": "number" },
+            "target_upsell_rate": { "type": "number" },
+            "target_referral_rate": { "type": "number" },
+            "target_review_count": { "type": "integer" },
+            "target_renewal_rate": { "type": "number" },
+            "target_churn_reduction": { "type": "number" }
+          }
+        },
+        "status": { "type": "string", "enum": ["draft", "active", "paused", "completed", "archived"] },
+        "results": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "created_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" }
+      }
+    },
+
+    "MultiChannelSequence": {
+      "type": "object",
+      "description": "Cross-channel outreach orchestration. Produced by Multi-Channel Orchestrator.",
+      "required": ["sequence_id", "sequence_name", "target_segment", "steps"],
+      "properties": {
+        "sequence_id": {
+          "type": "string",
+          "pattern": "^MCO-\\d{4}-\\d{4}$"
+        },
+        "sequence_name": { "type": "string" },
+        "target_segment": { "type": "string" },
+        "target_persona": { "type": "string" },
+        "total_duration_days": { "type": "integer" },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["step_number", "channel", "action_type", "delay_days"],
+            "properties": {
+              "step_number": { "type": "integer", "minimum": 1 },
+              "channel": {
+                "type": "string",
+                "enum": ["email", "linkedin", "phone", "social", "ads", "direct_mail", "sms", "whatsapp"]
+              },
+              "action_type": { "type": "string" },
+              "delay_days": { "type": "integer", "minimum": 0 },
+              "delay_condition": { "type": "string", "description": "Conditional delay (e.g., 'wait until email opened')" },
+              "content_reference": { "type": "string" },
+              "fallback_channel": { "type": "string" },
+              "fallback_trigger": { "type": "string", "description": "When to use fallback (e.g., 'no response in 3 days')" },
+              "time_window": { "type": "string", "description": "Preferred time window (e.g., '09:00-11:00 recipient_tz')" }
+            }
+          }
+        },
+        "channel_rules": {
+          "type": "object",
+          "properties": {
+            "max_touchpoints_per_week": { "type": "integer", "default": 5 },
+            "min_gap_hours_between_channels": { "type": "integer", "default": 12 },
+            "blackout_windows": { "type": "array", "items": { "type": "string" } },
+            "prevent_parallel_touches": { "type": "boolean", "default": true }
+          }
+        },
+        "escalation_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "trigger": { "type": "string" },
+              "action": { "type": "string" },
+              "channel": { "type": "string" }
+            }
+          }
+        },
+        "exit_conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": { "type": "string" },
+              "action": { "type": "string" }
+            }
+          }
+        },
+        "status": { "type": "string", "enum": ["draft", "active", "paused", "completed"] },
+        "performance_metrics": {
+          "type": "object",
+          "properties": {
+            "total_touchpoints_sent": { "type": "integer" },
+            "response_rate": { "type": "number" },
+            "meeting_rate": { "type": "number" },
+            "best_performing_channel": { "type": "string" },
+            "avg_touches_to_response": { "type": "number" }
+          }
+        },
+        "created_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" }
+      }
+    },
+
+    "AttributionReport": {
+      "type": "object",
+      "description": "Marketing attribution analysis. Produced by Attribution Analyst.",
+      "required": ["report_id", "report_date", "attribution_model", "channel_attribution"],
+      "properties": {
+        "report_id": { "type": "string" },
+        "report_date": { "type": "string", "format": "date" },
+        "attribution_model": {
+          "type": "string",
+          "enum": ["first_touch", "last_touch", "linear", "time_decay", "u_shaped", "w_shaped", "data_driven"]
+        },
+        "period": {
+          "type": "object",
+          "properties": {
+            "start": { "type": "string", "format": "date" },
+            "end": { "type": "string", "format": "date" }
+          }
+        },
+        "channel_attribution": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["channel", "attributed_conversions"],
+            "properties": {
+              "channel": { "type": "string" },
+              "touches": { "type": "integer" },
+              "attributed_conversions": { "type": "number" },
+              "attributed_revenue": { "type": "number" },
+              "roi": { "type": "number" },
+              "cost": { "type": "number" },
+              "cac": { "type": "number" }
+            }
+          }
+        },
+        "conversion_paths": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": { "type": "array", "items": { "type": "string" }, "description": "Ordered channel list" },
+              "frequency": { "type": "integer" },
+              "avg_conversion_time_days": { "type": "number" },
+              "conversion_rate": { "type": "number" }
+            }
+          }
+        },
+        "cohort_analysis": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "cohort_month": { "type": "string" },
+              "acquisition_channel": { "type": "string" },
+              "cohort_size": { "type": "integer" },
+              "conversion_rates_by_month": {
+                "type": "object",
+                "additionalProperties": { "type": "number" }
+              }
+            }
+          }
+        },
+        "clv_metrics": {
+          "type": "object",
+          "properties": {
+            "avg_clv_by_segment": { "type": "object", "additionalProperties": { "type": "number" } },
+            "avg_cac_by_channel": { "type": "object", "additionalProperties": { "type": "number" } },
+            "ltv_to_cac_ratio_by_segment": { "type": "object", "additionalProperties": { "type": "number" } }
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "action": { "type": "string" },
+              "rationale": { "type": "string" },
+              "expected_impact": { "type": "string" },
+              "priority": { "type": "string", "enum": ["high", "medium", "low"] }
+            }
+          }
+        },
+        "model_comparison": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "model_name": { "type": "string" },
+              "top_channel": { "type": "string" },
+              "key_insight": { "type": "string" }
+            }
+          }
+        },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "generated_by": { "type": "string" }
+      }
     }
   }
 }

@@ -65,6 +65,59 @@ mkdir "%CLIENT_DIR%\data\reports\daily"
 mkdir "%CLIENT_DIR%\data\reports\weekly"
 mkdir "%CLIENT_DIR%\data\reports\monthly"
 
+REM LinkedIn outreach
+mkdir "%CLIENT_DIR%\data\linkedin\sequences"
+mkdir "%CLIENT_DIR%\data\linkedin\messages"
+
+REM A/B testing
+mkdir "%CLIENT_DIR%\data\abtests\results"
+
+REM Landing pages
+mkdir "%CLIENT_DIR%\data\landing-pages"
+
+REM SEO
+mkdir "%CLIENT_DIR%\data\seo"
+
+REM ABM (Account-Based Marketing)
+mkdir "%CLIENT_DIR%\data\abm\accounts"
+mkdir "%CLIENT_DIR%\data\abm\buying-committee-maps"
+
+REM Social media
+mkdir "%CLIENT_DIR%\data\social\calendar"
+mkdir "%CLIENT_DIR%\data\social\posts\linkedin"
+mkdir "%CLIENT_DIR%\data\social\posts\twitter"
+mkdir "%CLIENT_DIR%\data\social\posts\instagram"
+mkdir "%CLIENT_DIR%\data\social\posts\facebook"
+mkdir "%CLIENT_DIR%\data\social\posts\approved"
+
+REM Paid media / ads
+mkdir "%CLIENT_DIR%\data\ads\campaigns"
+mkdir "%CLIENT_DIR%\data\ads\creatives"
+mkdir "%CLIENT_DIR%\data\ads\audiences"
+
+REM Video
+mkdir "%CLIENT_DIR%\data\video\scripts"
+mkdir "%CLIENT_DIR%\data\video\webinars"
+
+REM Sales enablement
+mkdir "%CLIENT_DIR%\data\sales-enablement\battlecards"
+mkdir "%CLIENT_DIR%\data\sales-enablement\proposals"
+mkdir "%CLIENT_DIR%\data\sales-enablement\roi-frameworks"
+mkdir "%CLIENT_DIR%\data\sales-enablement\case-studies"
+mkdir "%CLIENT_DIR%\data\sales-enablement\objection-guides"
+mkdir "%CLIENT_DIR%\data\sales-enablement\meeting-briefs"
+
+REM Retention and growth
+mkdir "%CLIENT_DIR%\data\retention\campaigns"
+mkdir "%CLIENT_DIR%\data\retention\sequences"
+mkdir "%CLIENT_DIR%\data\retention\surveys"
+
+REM Multi-channel orchestration
+mkdir "%CLIENT_DIR%\data\orchestration\lead-timelines"
+
+REM Attribution
+mkdir "%CLIENT_DIR%\data\attribution"
+
 REM Logs
 mkdir "%CLIENT_DIR%\logs\bootstrap"
 mkdir "%CLIENT_DIR%\logs\operations"
@@ -74,7 +127,7 @@ mkdir "%CLIENT_DIR%\reviews\round-1"
 mkdir "%CLIENT_DIR%\reviews\round-2"
 mkdir "%CLIENT_DIR%\reviews\final"
 
-echo   + Created 25+ directories
+echo   + Created 60+ directories
 
 REM --- Copy shared system files ---
 echo [2/5] Copying shared system files...
