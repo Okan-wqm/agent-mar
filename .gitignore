@@ -1,0 +1,55 @@
+# =============================================================================
+# Marketing Automation Agency — .gitignore
+# =============================================================================
+
+# --- OS files ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# --- IDE files ---
+.vscode/
+.idea/
+*.code-workspace
+
+# --- Environment and secrets ---
+.env
+.env.*
+*.key
+*.pem
+credentials.json
+secrets.yaml
+
+# --- Node modules (if any tooling is added) ---
+node_modules/
+
+# --- Python (if any tooling is added) ---
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# --- Temporary files ---
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# --- Log files (keep structure, ignore large logs) ---
+# We track logs in git for this system, but ignore oversized ones
+*.log.gz
+
+# --- Dashboard build artifacts ---
+dashboard/dist/
+dashboard/build/
+dashboard/node_modules/
+
+# --- Note: We DO track these intentionally ---
+# - clients/*/data/ (lead data, emails, reports — git is our database)
+# - clients/*/agents/ (generated agent definitions)
+# - clients/*/config/ (company profiles)
+# - clients/*/logs/ (operation logs for audit trail)
+# - .gitkeep files (to preserve empty directory structure)

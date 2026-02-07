@@ -1,0 +1,932 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Marketing Automation Agency — Shared Schemas",
+  "version": "1.0.0",
+  "description": "Canonical data contract definitions shared by all agents. Every agent MUST read from and write to these schemas exactly.",
+
+  "definitions": {
+
+    "LeadProfile": {
+      "type": "object",
+      "description": "One per potential customer. Created by Lead Researcher or Regional Scout, enriched by Lead Scorer, updated by Pipeline Tracker.",
+      "required": ["lead_id", "company", "decision_maker", "fit_score", "pipeline_stage", "region"],
+      "properties": {
+        "lead_id": {
+          "type": "string",
+          "pattern": "^L-\\d{4}-\\d{4}$",
+          "description": "Unique lead identifier. Format: L-YYYY-NNNN (e.g., L-2025-0042)"
+        },
+        "company": {
+          "type": "object",
+          "required": ["name", "sector", "website", "location"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "sector": { "type": "string", "minLength": 1 },
+            "sub_sector": { "type": "string" },
+            "size_range": {
+              "type": "string",
+              "enum": ["1-10", "11-50", "51-200", "201-500", "501-1000", "1001-5000", "5000+"]
+            },
+            "website": { "type": "string", "format": "uri" },
+            "location": {
+              "type": "object",
+              "required": ["country"],
+              "properties": {
+                "country": { "type": "string" },
+                "city": { "type": "string" },
+                "region": { "type": "string" }
+              }
+            },
+            "tech_stack": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "annual_revenue_range": { "type": "string" },
+            "employee_count_approx": { "type": "integer" },
+            "founding_year": { "type": "integer" },
+            "linkedin_url": { "type": "string", "format": "uri" },
+            "description": { "type": "string" }
+          }
+        },
+        "decision_maker": {
+          "type": "object",
+          "required": ["name", "title"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "title": { "type": "string", "minLength": 1 },
+            "title_local": { "type": "string", "description": "Job title in the local language (e.g., Geschäftsführer, Amministratore Delegato)" },
+            "email": { "type": "string", "format": "email" },
+            "linkedin": { "type": "string", "format": "uri" },
+            "phone": { "type": "string" },
+            "preferred_language": {
+              "type": "string",
+              "enum": ["en", "de", "it", "es", "fr", "pt", "nl", "tr"],
+              "description": "ISO 639-1 language code"
+            },
+            "english_proficiency": {
+              "type": "string",
+              "enum": ["native", "fluent", "conversational", "basic", "none", "unknown"]
+            }
+          }
+        },
+        "fit_score": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "ICP fit score assigned by Lead Scorer (1=poor fit, 10=perfect fit)"
+        },
+        "urgency_score": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Time-sensitivity score (1=no urgency, 5=immediate opportunity)"
+        },
+        "fit_rationale": {
+          "type": "string",
+          "description": "Explanation of why this lead fits (or doesn't fit) the ICP"
+        },
+        "recent_signals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["signal_type", "description", "date"],
+            "properties": {
+              "signal_type": {
+                "type": "string",
+                "enum": ["funding", "hiring", "expansion", "product_launch", "leadership_change", "partnership", "award", "news_mention", "tech_adoption", "pain_signal", "competitor_switch", "event_attendance", "content_engagement", "other"]
+              },
+              "description": { "type": "string" },
+              "date": { "type": "string", "format": "date" },
+              "source": { "type": "string" },
+              "relevance": { "type": "string", "enum": ["high", "medium", "low"] }
+            }
+          }
+        },
+        "approach_suggestion": {
+          "type": "string",
+          "description": "Recommended outreach angle based on signals and fit analysis"
+        },
+        "pipeline_stage": {
+          "type": "string",
+          "enum": [
+            "new",
+            "researched",
+            "scored",
+            "contacted",
+            "opened",
+            "clicked",
+            "replied",
+            "warm",
+            "qualified",
+            "meeting_booked",
+            "proposal_sent",
+            "closed_won",
+            "closed_lost",
+            "nurture",
+            "unsubscribed"
+          ]
+        },
+        "sequence_id": {
+          "type": "string",
+          "pattern": "^SEQ-\\d{4}-\\d{4}$",
+          "description": "Active email sequence this lead is enrolled in"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Free-form classification tags"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["date", "author", "content"],
+            "properties": {
+              "date": { "type": "string", "format": "date-time" },
+              "author": { "type": "string" },
+              "content": { "type": "string" }
+            }
+          }
+        },
+        "region": {
+          "type": "string",
+          "description": "Region identifier (e.g., DACH, Southern Europe, Benelux, Turkey)"
+        },
+        "research_language": {
+          "type": "string",
+          "description": "Language used for researching this lead"
+        },
+        "website_language": {
+          "type": "string",
+          "description": "Primary language of the lead's website"
+        },
+        "outreach_language_recommendation": {
+          "type": "string",
+          "enum": ["en", "de", "it", "es", "fr", "pt", "nl", "tr"],
+          "description": "Recommended language for email outreach"
+        },
+        "_regional_metadata": {
+          "type": "object",
+          "description": "Region-specific data collected by Regional Scout",
+          "properties": {
+            "local_registries_checked": { "type": "array", "items": { "type": "string" } },
+            "local_news_sources": { "type": "array", "items": { "type": "string" } },
+            "cultural_notes": { "type": "string" },
+            "local_competitors": { "type": "array", "items": { "type": "string" } },
+            "business_culture_notes": { "type": "string" }
+          }
+        },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" },
+        "updated_by": { "type": "string" }
+      }
+    },
+
+    "EmailSequenceConfig": {
+      "type": "object",
+      "description": "Defines a multi-step email campaign. Created by Email Sequence Designer.",
+      "required": ["sequence_id", "segment", "emails"],
+      "properties": {
+        "sequence_id": {
+          "type": "string",
+          "pattern": "^SEQ-\\d{4}-\\d{4}$"
+        },
+        "sequence_name": { "type": "string" },
+        "segment": { "type": "string" },
+        "target_persona": { "type": "string" },
+        "goal": { "type": "string" },
+        "total_steps": { "type": "integer", "minimum": 1 },
+        "emails": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["step", "delay_days", "purpose", "tone", "cta_type"],
+            "properties": {
+              "step": { "type": "integer", "minimum": 1 },
+              "delay_days": { "type": "integer", "minimum": 0 },
+              "purpose": {
+                "type": "string",
+                "enum": ["introduction", "value_proposition", "social_proof", "case_study", "pain_agitation", "objection_handling", "breakup", "re_engagement", "meeting_request", "follow_up", "nurture"]
+              },
+              "tone": {
+                "type": "string",
+                "enum": ["professional", "conversational", "consultative", "friendly", "urgent", "empathetic", "authoritative"]
+              },
+              "cta_type": {
+                "type": "string",
+                "enum": ["reply", "book_meeting", "visit_link", "download", "watch_demo", "forward_to_colleague", "confirm_interest", "soft_no_cta"]
+              },
+              "template_id": { "type": "string" },
+              "max_word_count": { "type": "integer", "default": 200 },
+              "preferred_send_time": {
+                "type": "string",
+                "description": "Preferred time window (e.g., '09:00-11:00')"
+              },
+              "subject_line_template": { "type": "string" },
+              "preview_text_template": { "type": "string" }
+            }
+          }
+        },
+        "branching_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["trigger", "action"],
+            "properties": {
+              "trigger": {
+                "type": "string",
+                "enum": [
+                  "opened",
+                  "clicked",
+                  "replied",
+                  "bounced",
+                  "no_open_3_days",
+                  "no_click_after_open",
+                  "positive_reply",
+                  "negative_reply",
+                  "meeting_request",
+                  "unsubscribe",
+                  "out_of_office"
+                ]
+              },
+              "after_step": { "type": "integer" },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "next_step",
+                  "skip_step",
+                  "pause_sequence",
+                  "end_sequence",
+                  "move_to_sequence",
+                  "add_tag",
+                  "change_segment",
+                  "alert_human",
+                  "delay_extra_days",
+                  "send_immediate",
+                  "move_to_nurture"
+                ]
+              },
+              "action_value": {
+                "type": "string",
+                "description": "Parameter for the action (e.g., sequence_id for move_to_sequence, tag name for add_tag)"
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10,
+                "description": "Higher priority rules evaluated first"
+              }
+            }
+          }
+        },
+        "exit_conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": { "type": "string" },
+              "action": { "type": "string" }
+            }
+          }
+        },
+        "created_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "active", "paused", "completed", "archived"]
+        }
+      }
+    },
+
+    "QAReviewReport": {
+      "type": "object",
+      "description": "Quality assessment produced by QA Reviewer or Agent Critic.",
+      "required": ["review_id", "content_type", "verdict", "overall_quality_score", "issues"],
+      "properties": {
+        "review_id": {
+          "type": "string",
+          "pattern": "^QA-\\d{4}-\\d{4}$"
+        },
+        "content_type": {
+          "type": "string",
+          "enum": ["agent_definition", "email_template", "email_personalized", "blog_post", "linkedin_post", "case_study", "whitepaper", "newsletter", "social_media", "landing_page", "email_sequence"]
+        },
+        "content_reference": {
+          "type": "string",
+          "description": "File path or ID of the content being reviewed"
+        },
+        "reviewer": { "type": "string" },
+        "review_round": { "type": "integer", "minimum": 1 },
+        "verdict": {
+          "type": "string",
+          "enum": ["APPROVED", "REVISION_REQUIRED", "REJECTED"]
+        },
+        "overall_quality_score": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["severity", "category", "description"],
+            "properties": {
+              "severity": {
+                "type": "string",
+                "enum": ["critical", "major", "minor", "suggestion"]
+              },
+              "category": {
+                "type": "string",
+                "enum": [
+                  "trigger_accuracy",
+                  "persona_alignment",
+                  "responsibility_clarity",
+                  "data_contract",
+                  "data_flow",
+                  "failure_coverage",
+                  "feedback_loop",
+                  "grammar",
+                  "brand_voice",
+                  "personalization",
+                  "spam_risk",
+                  "legal_compliance",
+                  "factual_accuracy",
+                  "tone",
+                  "cta_effectiveness",
+                  "structure",
+                  "schema_mismatch",
+                  "missing_section",
+                  "boundary_violation",
+                  "other"
+                ]
+              },
+              "description": { "type": "string" },
+              "location": {
+                "type": "string",
+                "description": "Section, line, or field where the issue was found"
+              },
+              "fix_instruction": { "type": "string" },
+              "previous_issue_ref": {
+                "type": "string",
+                "description": "Reference to the same issue in a prior review round, for regression tracking"
+              }
+            }
+          }
+        },
+        "spam_risk_assessment": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "number", "minimum": 0, "maximum": 100 },
+            "flags": { "type": "array", "items": { "type": "string" } },
+            "recommendation": { "type": "string" }
+          }
+        },
+        "legal_compliance": {
+          "type": "object",
+          "properties": {
+            "kvkk_compliant": { "type": "boolean" },
+            "gdpr_compliant": { "type": "boolean" },
+            "can_spam_compliant": { "type": "boolean" },
+            "issues": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "summary": { "type": "string" },
+        "reviewed_at": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "ContentBrief": {
+      "type": "object",
+      "description": "Instructions for content production. Created by Content Strategist, consumed by Copywriter.",
+      "required": ["brief_id", "content_type", "topic", "target_segment", "tone", "word_count_range"],
+      "properties": {
+        "brief_id": {
+          "type": "string",
+          "pattern": "^BRF-\\d{4}-\\d{4}$"
+        },
+        "content_type": {
+          "type": "string",
+          "enum": ["blog_post", "linkedin_post", "email_template", "case_study", "whitepaper", "newsletter", "social_media", "landing_page"]
+        },
+        "topic": { "type": "string" },
+        "angle": { "type": "string" },
+        "target_segment": { "type": "string" },
+        "target_persona": { "type": "string" },
+        "tone": {
+          "type": "string",
+          "enum": ["professional", "conversational", "consultative", "friendly", "urgent", "empathetic", "authoritative"]
+        },
+        "cta": { "type": "string" },
+        "word_count_range": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "integer" },
+            "max": { "type": "integer" }
+          }
+        },
+        "key_points": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "url": { "type": "string", "format": "uri" },
+              "relevance": { "type": "string" }
+            }
+          }
+        },
+        "avoid": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Topics, phrases, or angles to avoid"
+        },
+        "seo_keywords": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "deadline": { "type": "string", "format": "date" },
+        "priority": {
+          "type": "string",
+          "enum": ["urgent", "high", "normal", "low"]
+        },
+        "created_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "assigned", "in_progress", "in_review", "approved", "published"]
+        }
+      }
+    },
+
+    "PipelineStatusReport": {
+      "type": "object",
+      "description": "Daily funnel snapshot. Produced by Pipeline Tracker.",
+      "required": ["report_date", "pipeline_summary"],
+      "properties": {
+        "report_date": { "type": "string", "format": "date" },
+        "pipeline_summary": {
+          "type": "object",
+          "description": "Count of leads per pipeline stage",
+          "properties": {
+            "new": { "type": "integer", "default": 0 },
+            "researched": { "type": "integer", "default": 0 },
+            "scored": { "type": "integer", "default": 0 },
+            "contacted": { "type": "integer", "default": 0 },
+            "opened": { "type": "integer", "default": 0 },
+            "clicked": { "type": "integer", "default": 0 },
+            "replied": { "type": "integer", "default": 0 },
+            "warm": { "type": "integer", "default": 0 },
+            "qualified": { "type": "integer", "default": 0 },
+            "meeting_booked": { "type": "integer", "default": 0 },
+            "proposal_sent": { "type": "integer", "default": 0 },
+            "closed_won": { "type": "integer", "default": 0 },
+            "closed_lost": { "type": "integer", "default": 0 },
+            "nurture": { "type": "integer", "default": 0 },
+            "unsubscribed": { "type": "integer", "default": 0 },
+            "total_active": { "type": "integer" }
+          }
+        },
+        "transitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["lead_id", "from_stage", "to_stage", "timestamp"],
+            "properties": {
+              "lead_id": { "type": "string" },
+              "from_stage": { "type": "string" },
+              "to_stage": { "type": "string" },
+              "timestamp": { "type": "string", "format": "date-time" },
+              "reason": { "type": "string" },
+              "triggered_by": { "type": "string" }
+            }
+          }
+        },
+        "alerts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["alert_type", "priority", "message"],
+            "properties": {
+              "alert_type": {
+                "type": "string",
+                "enum": ["hot_lead", "cooling_lead", "stalled_lead", "bounce", "unsubscribe", "positive_reply", "meeting_request", "quota_warning", "sequence_completion", "anomaly"]
+              },
+              "priority": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low"]
+              },
+              "message": { "type": "string" },
+              "lead_id": { "type": "string" },
+              "action_required": { "type": "string" }
+            }
+          }
+        },
+        "velocity_metrics": {
+          "type": "object",
+          "properties": {
+            "avg_days_new_to_contacted": { "type": "number" },
+            "avg_days_contacted_to_replied": { "type": "number" },
+            "avg_days_replied_to_meeting": { "type": "number" },
+            "avg_days_meeting_to_proposal": { "type": "number" },
+            "avg_days_proposal_to_close": { "type": "number" },
+            "overall_cycle_days": { "type": "number" },
+            "conversion_rate_contacted_to_replied": { "type": "number" },
+            "conversion_rate_replied_to_meeting": { "type": "number" },
+            "conversion_rate_meeting_to_close": { "type": "number" }
+          }
+        },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "generated_by": { "type": "string" }
+      }
+    },
+
+    "MarketIntelReport": {
+      "type": "object",
+      "description": "Industry intelligence. Produced by Market Intelligence agent.",
+      "required": ["report_date", "market_trends"],
+      "properties": {
+        "report_date": { "type": "string", "format": "date" },
+        "market_trends": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["trend", "relevance"],
+            "properties": {
+              "trend": { "type": "string" },
+              "description": { "type": "string" },
+              "relevance": { "type": "string", "enum": ["high", "medium", "low"] },
+              "source": { "type": "string" },
+              "actionable_insight": { "type": "string" },
+              "affected_segments": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "competitor_updates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["competitor", "update", "threat_level"],
+            "properties": {
+              "competitor": { "type": "string" },
+              "update": { "type": "string" },
+              "threat_level": { "type": "string", "enum": ["high", "medium", "low"] },
+              "source": { "type": "string" },
+              "recommended_response": { "type": "string" }
+            }
+          }
+        },
+        "content_opportunities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "topic": { "type": "string" },
+              "content_type_suggestion": { "type": "string" },
+              "reasoning": { "type": "string" },
+              "urgency": { "type": "string", "enum": ["immediate", "this_week", "this_month", "backlog"] },
+              "target_segment": { "type": "string" }
+            }
+          }
+        },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "generated_by": { "type": "string" }
+      }
+    },
+
+    "DailyAnalyticsReport": {
+      "type": "object",
+      "description": "Performance metrics. Produced by Analyst.",
+      "required": ["report_date", "report_type"],
+      "properties": {
+        "report_date": { "type": "string", "format": "date" },
+        "report_type": {
+          "type": "string",
+          "enum": ["daily", "weekly", "monthly"]
+        },
+        "period": {
+          "type": "object",
+          "properties": {
+            "start": { "type": "string", "format": "date" },
+            "end": { "type": "string", "format": "date" }
+          }
+        },
+        "email_metrics": {
+          "type": "object",
+          "properties": {
+            "sent": { "type": "integer" },
+            "delivered": { "type": "integer" },
+            "opened": { "type": "integer" },
+            "clicked": { "type": "integer" },
+            "replied": { "type": "integer" },
+            "bounced": { "type": "integer" },
+            "unsubscribed": { "type": "integer" },
+            "open_rate": { "type": "number" },
+            "click_rate": { "type": "number" },
+            "reply_rate": { "type": "number" },
+            "bounce_rate": { "type": "number" }
+          }
+        },
+        "pipeline_metrics": {
+          "type": "object",
+          "properties": {
+            "new_leads": { "type": "integer" },
+            "leads_contacted": { "type": "integer" },
+            "meetings_booked": { "type": "integer" },
+            "proposals_sent": { "type": "integer" },
+            "deals_won": { "type": "integer" },
+            "deals_lost": { "type": "integer" },
+            "pipeline_value": { "type": "number" },
+            "conversion_rates": {
+              "type": "object",
+              "additionalProperties": { "type": "number" }
+            }
+          }
+        },
+        "content_metrics": {
+          "type": "object",
+          "properties": {
+            "briefs_created": { "type": "integer" },
+            "drafts_produced": { "type": "integer" },
+            "items_approved": { "type": "integer" },
+            "items_rejected": { "type": "integer" },
+            "avg_quality_score": { "type": "number" },
+            "revision_rounds_avg": { "type": "number" }
+          }
+        },
+        "segment_performance": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "segment": { "type": "string" },
+              "leads_count": { "type": "integer" },
+              "open_rate": { "type": "number" },
+              "reply_rate": { "type": "number" },
+              "conversion_rate": { "type": "number" },
+              "trend": { "type": "string", "enum": ["improving", "stable", "declining"] }
+            }
+          }
+        },
+        "regional_performance": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "region": { "type": "string" },
+              "leads_found": { "type": "integer" },
+              "avg_fit_score": { "type": "number" },
+              "response_rate": { "type": "number" },
+              "top_sectors": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "top_performers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "lead_id": { "type": "string" },
+              "company_name": { "type": "string" },
+              "reason": { "type": "string" }
+            }
+          }
+        },
+        "alerts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "severity": { "type": "string", "enum": ["critical", "warning", "info"] },
+              "message": { "type": "string" },
+              "recommended_action": { "type": "string" }
+            }
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "area": { "type": "string" },
+              "recommendation": { "type": "string" },
+              "expected_impact": { "type": "string" },
+              "priority": { "type": "string", "enum": ["high", "medium", "low"] }
+            }
+          }
+        },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "generated_by": { "type": "string" }
+      }
+    },
+
+    "SendLog": {
+      "type": "object",
+      "description": "Email dispatch records. Managed by Scheduler.",
+      "required": ["log_date", "entries"],
+      "properties": {
+        "log_date": { "type": "string", "format": "date" },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["lead_id", "sequence_id", "step", "scheduled_time", "status"],
+            "properties": {
+              "lead_id": { "type": "string" },
+              "sequence_id": { "type": "string" },
+              "step": { "type": "integer" },
+              "email_file": { "type": "string", "description": "Path to the personalized email file" },
+              "scheduled_time": { "type": "string", "format": "date-time" },
+              "actual_send_time": { "type": "string", "format": "date-time" },
+              "status": {
+                "type": "string",
+                "enum": ["scheduled", "sent", "delivered", "failed", "cancelled", "deferred"]
+              },
+              "failure_reason": { "type": "string" },
+              "engagement_events": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "event_type": {
+                      "type": "string",
+                      "enum": ["open", "click", "reply", "bounce", "unsubscribe", "complaint", "forward"]
+                    },
+                    "timestamp": { "type": "string", "format": "date-time" },
+                    "metadata": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "daily_summary": {
+          "type": "object",
+          "properties": {
+            "total_scheduled": { "type": "integer" },
+            "total_sent": { "type": "integer" },
+            "total_failed": { "type": "integer" },
+            "total_cancelled": { "type": "integer" },
+            "send_limit_remaining": { "type": "integer" },
+            "unique_recipients": { "type": "integer" }
+          }
+        },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "generated_by": { "type": "string" }
+      }
+    },
+
+    "RegionalStrategy": {
+      "type": "object",
+      "description": "Multi-region prospecting strategy. Produced by Regional Coordinator.",
+      "required": ["strategy_date", "regions"],
+      "properties": {
+        "strategy_date": { "type": "string", "format": "date" },
+        "total_daily_quota": { "type": "integer" },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["region_id", "daily_quota", "search_languages"],
+            "properties": {
+              "region_id": { "type": "string" },
+              "region_name": { "type": "string" },
+              "countries": { "type": "array", "items": { "type": "string" } },
+              "daily_quota": { "type": "integer" },
+              "allocation_percentage": { "type": "number" },
+              "search_languages": { "type": "array", "items": { "type": "string" } },
+              "sector_focus": { "type": "array", "items": { "type": "string" } },
+              "priority": { "type": "string", "enum": ["high", "medium", "low"] },
+              "market_size_score": { "type": "number", "minimum": 1, "maximum": 10 },
+              "conversion_rate_historical": { "type": "number" },
+              "strategic_priority_score": { "type": "number", "minimum": 1, "maximum": 10 },
+              "research_difficulty": { "type": "string", "enum": ["easy", "moderate", "hard"] }
+            }
+          }
+        },
+        "rebalance_schedule": { "type": "string" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "generated_by": { "type": "string" }
+      }
+    },
+
+    "ScoutBrief": {
+      "type": "object",
+      "description": "Dispatch instructions for Regional Scout. Produced by Regional Coordinator.",
+      "required": ["brief_id", "region_id", "search_languages", "daily_quota"],
+      "properties": {
+        "brief_id": { "type": "string" },
+        "region_id": { "type": "string" },
+        "region_name": { "type": "string" },
+        "search_languages": { "type": "array", "items": { "type": "string" } },
+        "daily_quota": { "type": "integer" },
+        "sector_focus": { "type": "array", "items": { "type": "string" } },
+        "query_templates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "language": { "type": "string" },
+              "query": { "type": "string" },
+              "target": { "type": "string" }
+            }
+          }
+        },
+        "local_directories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "url": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        "cultural_notes": {
+          "type": "object",
+          "properties": {
+            "decision_maker_titles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "english": { "type": "string" },
+                  "local": { "type": "string" }
+                }
+              }
+            },
+            "business_culture": { "type": "string" },
+            "outreach_language_recommendation": { "type": "string" },
+            "formality_level": { "type": "string", "enum": ["formal", "semi-formal", "informal"] },
+            "preferred_contact_method": { "type": "string" }
+          }
+        },
+        "exclusions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Companies or domains to skip"
+        },
+        "dispatch_date": { "type": "string", "format": "date" },
+        "dispatched_by": { "type": "string" }
+      }
+    },
+
+    "BootstrapProgress": {
+      "type": "object",
+      "description": "Tracks agent generation progress. Managed by Bootstrap Orchestrator.",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["not_started", "in_progress", "completed", "failed"]
+        },
+        "current_wave": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "waves": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "wave_number": { "type": "integer" },
+              "agents": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "agent_name": { "type": "string" },
+                    "status": {
+                      "type": "string",
+                      "enum": ["pending", "writing", "reviewing", "revising", "approved", "escalated"]
+                    },
+                    "current_round": { "type": "integer" },
+                    "max_rounds": { "type": "integer", "default": 3 },
+                    "latest_score": { "type": "number" },
+                    "latest_verdict": { "type": "string" },
+                    "file_path": { "type": "string" }
+                  }
+                }
+              },
+              "consistency_check_passed": { "type": "boolean" }
+            }
+          }
+        },
+        "system_validation": {
+          "type": "object",
+          "properties": {
+            "data_lifecycle_trace": { "type": "boolean" },
+            "responsibility_completeness": { "type": "boolean" },
+            "failure_cascade_analysis": { "type": "boolean" },
+            "orchestrator_validation": { "type": "boolean" }
+          }
+        },
+        "started_at": { "type": "string", "format": "date-time" },
+        "completed_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}
